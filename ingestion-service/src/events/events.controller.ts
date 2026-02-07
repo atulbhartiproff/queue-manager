@@ -1,12 +1,15 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { EventrequestDto } from './dto/event-request.dto';
+import { EventsPublisher } from './events.publisher';
 
 @Controller('events')
 export class EventsController {
+    constructor(private publisher:EventsPublisher){}
+    
     @Post()
     @HttpCode(202)
-    ingestevent(@Body() body:EventrequestDto){
-        console.log('Recieved body',body);
+    async ingestevent(@Body() body:EventrequestDto){
+        await this.publisher.publishEvent(body);
         return;
     }
 }
