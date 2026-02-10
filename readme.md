@@ -1,8 +1,8 @@
-# Event Ingestion Platform (API → Queue → Worker)
+# Project 1 — Event Ingestion Platform (API → Queue → Worker)
 
 This project is the first part of a 3-project ARC focused on building a production-style backend system.
 
-The goal of this project is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
+The goal of Project 1 is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
 
 ---
 
@@ -139,16 +139,36 @@ Sending the same event twice:
 
 ---
 
-## 🚀 Next Step
+## 🚀 Future Improvements (Planned Enhancements)
 
-The Project will be extended with:
+Project 1 establishes the core event-driven ingestion backbone.
+To make the system more production-complete, the following upgrades are planned:
 
-* PostgreSQL persistence
-* Retry + Dead Letter Queue
-* Monitoring + load testing
+### Dead Letter Queue (DLQ)
+
+* Add a dedicated failure queue (e.g., `events.dlq`) for messages that fail repeatedly.
+* Prevent event loss during processing errors.
+* Enable safer debugging and replay of failed events.
+
+### Retry + Backoff Strategy
+
+* Introduce controlled retries with exponential backoff before pushing to DLQ.
+
+### Monitoring & Metrics
+
+* Add structured metrics for:
+
+  * queue depth
+  * processing latency
+  * failure rate
+
+### PostgreSQL Indexing + Optimization
+
+* Improve query performance for high event volume workloads.
+
+### Deployment Hardening
+
+* Containerize both services with production configs.
+* Add CI checks and automated testing.
 
 ---
-
-## Resume Summary Line
-
-> Built an event-driven ingestion platform using NestJS, RabbitMQ, and Redis with asynchronous processing and idempotent event handling.
