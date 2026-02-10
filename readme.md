@@ -1,8 +1,8 @@
-# Project 1 — Event Ingestion Platform (API → Queue → Worker)
+# Event Ingestion Platform (API → Queue → Worker)
 
 This project is the first part of a 3-project ARC focused on building a production-style backend system.
 
-The goal of Project 1 is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
+The goal of this project is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
 
 ---
 
@@ -141,7 +141,7 @@ Sending the same event twice:
 
 ## 🚀 Future Improvements (Planned Enhancements)
 
-Project 1 establishes the core event-driven ingestion backbone.
+This workflow establishes the core event-driven ingestion backbone.
 To make the system more production-complete, the following upgrades are planned:
 
 ### Dead Letter Queue (DLQ)
