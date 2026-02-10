@@ -1,136 +1,154 @@
-# Queue Manager System
+# Project 1 — Event Ingestion Platform (API → Queue → Worker)
 
-A robust event ingestion and queue management system built with NestJS and Kafka for handling high-throughput event processing.
+This project is the first part of a 3-project ARC focused on building a production-style backend system.
 
-## Overview
+The goal of Project 1 is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
 
-The Queue Manager System is designed to efficiently ingest, process, and manage events in real-time. It provides a scalable architecture for event distribution across multiple consumers and handles asynchronous processing with reliability and fault tolerance.
+---
 
-## Features
+## ✅ What This Project Does
 
-- **Event Ingestion**: RESTful API for submitting events
-- **Kafka Integration**: Built-in Apache Kafka producer/consumer support
-- **Asynchronous Processing**: Non-blocking event handling
-- **Health Checks**: System health monitoring endpoints
-- **Scalability**: Designed for high-throughput scenarios
-- **Reliability**: Event persistence and retry mechanisms
+* Accepts incoming events via an HTTP API
+* Validates event structure at the boundary
+* Publishes events into a message queue (RabbitMQ)
+* Processes events asynchronously using a worker service
+* Prevents duplicate processing using Redis idempotency
 
-## Architecture
+This mirrors how large-scale systems handle high traffic reliably.
 
-The system is composed of:
+---
 
-- **Ingestion Service**: NestJS-based API for event intake
-- **Event Producer**: Kafka producer for publishing events
-- **Queue Processing**: Asynchronous event processing pipeline
-- **Health Monitoring**: Real-time system health checks
-
-## Tech Stack
-
-- **Runtime**: Java 21 LTS (backend), Node.js (NestJS)
-- **Framework**: NestJS (TypeScript)
-- **Message Queue**: Apache Kafka
-- **Build Tools**: Maven, npm
-
-## Project Structure
+## 🏗 Architecture
 
 ```
-.
-├── ingestion-service/          # NestJS Ingestion API
-│   ├── src/
-│   │   ├── app.controller.ts   # Event endpoints
-│   │   ├── app.service.ts      # Business logic
-│   │   └── main.ts             # Application entry
-│   ├── package.json
-│   └── tsconfig.json
-└── README.md
+Client
+  ↓
+Ingestion API (NestJS)
+  ↓
+RabbitMQ Queue (events.ingest)
+  ↓
+Worker Service (NestJS Consumer)
+  ↓
+Redis (Idempotency Check)
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## 📌 Core Concepts Implemented
 
-- Node.js 18+
-- Kafka running locally or accessible
+### 1. Async Event Ingestion
 
-### Installation
+The API responds immediately with **202 Accepted**, without doing heavy work.
 
-```bash
-# Install dependencies
-cd ingestion-service
-npm install
-```
+### 2. Message Queue Decoupling
 
-### Running the Application
+RabbitMQ acts as a buffer so spikes in traffic do not crash the system.
 
-```bash
-# Development mode with watch
-npm run start:dev
+### 3. Worker-Based Processing
 
-# Production build
-npm run build
-npm run start:prod
-```
+A separate worker consumes events from the queue and processes them.
 
-### Health Check
+### 4. Idempotency with Redis
 
-```bash
-curl http://localhost:3000/health
-```
+RabbitMQ may deliver messages more than once.
 
-## API Endpoints
+To prevent duplicates, the worker checks Redis:
 
-### POST /events
-Submit a new event for processing
+* If `processed:{event_id}` exists → skip
+* Otherwise → process and mark as processed
 
-**Request Body:**
+---
+
+## 🧾 Event Schema
+
+Example event payload:
+
 ```json
 {
-  "eventType": "string",
-  "payload": "object",
-  "timestamp": "ISO8601"
+  "event_id": "evt_001",
+  "type": "GRIEVANCE",
+  "timestamp": "2026-02-03T12:30:00Z",
+  "payload": {
+    "message": "Water issue"
+  }
 }
 ```
 
-### GET /health
-System health status
+---
 
-## Environment Configuration
+## ⚙️ Tech Stack
 
-Create `.env` file in `ingestion-service/`:
+* **TypeScript + NestJS** (API + Worker)
+* **RabbitMQ** (Message Queue)
+* **Redis** (Idempotency)
+* **Docker Compose** (Local Infrastructure)
 
-```env
-KAFKA_BROKER=localhost:9092
-KAFKA_TOPIC=events
-NODE_ENV=development
-```
+---
 
-## Development
+## ▶️ Running Locally
 
-### Running Tests
+### 1. Start Infrastructure
 
 ```bash
-npm run test
-npm run test:e2e
+docker compose up -d
 ```
 
-### Linting
+RabbitMQ UI:
+
+* [http://localhost:15672](http://localhost:15672)
+* Login: `guest / guest`
+
+---
+
+### 2. Run Ingestion API
 
 ```bash
-npm run lint
-npm run lint:fix
+cd ingestion-service
+npm run start:dev
 ```
 
-## Contributing
+---
 
-1. Create a feature branch
-2. Make your changes
-3. Commit with descriptive messages
-4. Push and create a Pull Request
+### 3. Run Worker Service
 
-## License
+```bash
+cd worker-service
+npm run start:dev
+```
 
-MIT
+---
 
-## Support
+## 🧪 Testing
 
-For issues and questions, please open an issue on GitHub.
+Send a valid event:
+
+```powershell
+$body = @{ event_id="evt_001"; type="GRIEVANCE"; timestamp="2026-02-03T12:30:00Z"; payload=@{ message="Water issue" } } | ConvertTo-Json -Depth 5;
+Invoke-WebRequest -Uri "http://localhost:3000/events" -Method POST -Headers @{ "Content-Type"="application/json" } -Body $body
+```
+
+Expected:
+
+* API returns **202 Accepted**
+* Worker prints processing log
+
+Sending the same event twice:
+
+* First time → processed
+* Second time → skipped as duplicate
+
+---
+
+## 🚀 Next Step
+
+Project 1 will be extended with:
+
+* PostgreSQL persistence
+* Retry + Dead Letter Queue
+* Monitoring + load testing
+
+---
+
+## Resume Summary Line
+
+> Built an event-driven ingestion platform using NestJS, RabbitMQ, and Redis with asynchronous processing and idempotent event handling.
