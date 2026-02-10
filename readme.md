@@ -1,8 +1,8 @@
-# Project 1 — Event Ingestion Platform (API → Queue → Worker)
+# Event Ingestion Platform (API → Queue → Worker)
 
 This project is the first part of a 3-project ARC focused on building a production-style backend system.
 
-The goal of Project 1 is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
+The goal of this project is to build a **real event-driven ingestion pipeline** where incoming requests are accepted quickly, queued asynchronously, and processed safely in the background.
 
 ---
 
@@ -141,7 +141,7 @@ Sending the same event twice:
 
 ## 🚀 Next Step
 
-Project 1 will be extended with:
+The Project will be extended with:
 
 * PostgreSQL persistence
 * Retry + Dead Letter Queue
